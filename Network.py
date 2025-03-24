@@ -49,16 +49,33 @@ class LSTM(L.LightningModule):
     #The new short term memory is the tanh of the new long term memory times the percent of long term memory we want to keep as short term memory
     updated_short_mem = torch.tanh(updated_long_mem) * output_percent
 
+    #Return the new long term memory and short term memory we want to pass on to the next sequence of the lstm
     return [updated_long_mem, updated_short_mem]
 
-  def forward(self, input):
+  def forward(self, input_vals):
     #Moves forward through the network
-    pass
+    
+    #First initialize the long term memory and short term memory to 0
+    long_mem = 0
+    short_mem = 0
+
+    #For each input value, we update the long and short term memories
+    for input in input_vals:
+      long_mem, short_mem = self.lstm_unit(input, long_mem, short_mem)
+    
+    #Return the short term memory (the output of the lstm)
+    return short_mem
 
   def optimizer_config(self):
     #Configures the optimizer
-    pass
+    return Adam(self.parameters())
 
   def training(self, batch, batch_ind):
     #Calculates the loss values and training progression
-    pass
+    input_i, label_i = batch
+    output_i = self.forward(input_i[0])
+    loss = (output_i - label_i[0]) ** 2
+    self.log("training_loss", loss)
+    self.log(f"out_{label_i}", output_i)
+    
+    return loss
