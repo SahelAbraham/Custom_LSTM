@@ -10,7 +10,7 @@ class LSTM(L.LightningModule):
   
   def __init__(self):
     #Initializes the LSTM weights and biases
-    super.__init__()
+    super().__init__()
     mean = torch.tensor(0.0)
     std = torch.tensor(1.0)
 
@@ -66,11 +66,11 @@ class LSTM(L.LightningModule):
     #Return the short term memory (the output of the lstm)
     return short_mem
 
-  def optimizer_config(self):
+  def configure_optimizers(self):
     #Configures the optimizer
     return Adam(self.parameters())
 
-  def training(self, batch, batch_ind):
+  def training_step(self, batch, batch_ind):
     #Calculates the loss values and training progression
     input_i, label_i = batch
     output_i = self.forward(input_i[0])
